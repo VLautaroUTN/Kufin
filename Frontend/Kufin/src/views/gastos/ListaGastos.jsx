@@ -6,7 +6,8 @@ import {
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
-const categorias = ['Alimentos', 'Servicios', 'Transporte', 'Ocio', 'Otros'];
+// 1. Agregamos la nueva categoría a la lista de opciones
+const categorias = ['Pendiente de clasificar', 'Alimentos', 'Servicios', 'Transporte', 'Ocio', 'Otros'];
 
 const obtenerFechaActual = () => {
   const hoy = new Date();
@@ -16,14 +17,18 @@ const obtenerFechaActual = () => {
   return `${anio}-${mes}-${dia}`;
 };
 
-const estadoInicialFormulario = { fecha: obtenerFechaActual(), monto: '', descripcion: '', categoria: '' };
+// 2. Le decimos al formulario que arranque con esa categoría seleccionada por defecto
+const estadoInicialFormulario = { 
+  fecha: obtenerFechaActual(), 
+  monto: '', 
+  descripcion: '', 
+  categoria: 'Pendiente de clasificar' 
+};
 
 const ListaGastos = () => {
   const [openModal, setOpenModal] = useState(false);
   const [formulario, setFormulario] = useState(estadoInicialFormulario);
   const [gastos, setGastos] = useState([]);
-  
-  // NUEVO ESTADO: Para saber si estamos editando y qué ID específicamente
   const [idEnEdicion, setIdEnEdicion] = useState(null);
 
   useEffect(() => {
@@ -38,32 +43,27 @@ const ListaGastos = () => {
     cargarGastos();
   }, []);
 
-  // Función para abrir el modal para un GASTO NUEVO
   const handleAbrirModal = () => {
     setFormulario(estadoInicialFormulario);
-    setIdEnEdicion(null); // Nos aseguramos de que no haya ningún ID seleccionado
+    setIdEnEdicion(null);
     setOpenModal(true);
   };
   
-  // NUEVA FUNCIÓN: Abrir modal para EDITAR
   const handleAbrirEditar = (gasto) => {
-    // 1. Cargamos los datos del gasto en el formulario
     setFormulario({
       fecha: gasto.fecha,
       monto: gasto.monto,
       descripcion: gasto.descripcion,
       categoria: gasto.categoria
     });
-    // 2. Guardamos el ID del gasto que estamos tocando
     setIdEnEdicion(gasto.id);
-    // 3. Abrimos la ventana
     setOpenModal(true);
   };
 
   const handleCerrarModal = () => { 
     setOpenModal(false); 
     setFormulario(estadoInicialFormulario); 
-    setIdEnEdicion(null); // Limpiamos el ID al cerrar
+    setIdEnEdicion(null);
   };
 
   const handleChange = (e) => {
@@ -73,20 +73,19 @@ const ListaGastos = () => {
 
   const handleGuardar = async () => {
     try {
+
+      const usuarioIdReal = localStorage.getItem('kufin_usuario_id');
+
       const datosParaEnviar = {
         ...formulario,
         monto: Number(formulario.monto), 
-        usuarioId: 'lautaro-dev-123'     
+        usuarioId: usuarioIdReal || 'no-logueado'     
       };
 
       if (idEnEdicion) {
-        // SI HAY UN ID, ESTAMOS EDITANDO (PATCH)
         const respuesta = await axios.patch(`http://localhost:3000/gastos/${idEnEdicion}`, datosParaEnviar);
-        
-        // Buscamos el gasto viejo en nuestra tabla y lo reemplazamos por el actualizado
         setGastos(gastos.map(g => g.id === idEnEdicion ? respuesta.data : g));
       } else {
-        // SI NO HAY ID, ESTAMOS CREANDO (POST)
         const respuesta = await axios.post('http://localhost:3000/gastos', datosParaEnviar);
         setGastos([...gastos, respuesta.data]);
       }
@@ -100,15 +99,10 @@ const ListaGastos = () => {
     }
   };
 
-  // NUEVA FUNCIÓN: Eliminar Gasto
   const handleBorrar = async (id) => {
-    // Pedimos confirmación antes de borrar
     if (window.confirm("¿Estás seguro de que querés eliminar este gasto?")) {
       try {
-        // 1. Le decimos a NestJS que lo borre de la base de datos
         await axios.delete(`http://localhost:3000/gastos/${id}`);
-        
-        // 2. Lo borramos visualmente de nuestra tabla en React
         setGastos(gastos.filter(g => g.id !== id));
       } catch (error) {
         console.error("Error al borrar:", error);
@@ -138,7 +132,6 @@ const ListaGastos = () => {
                 <TableCell>{gasto.categoria}</TableCell>
                 <TableCell align="right">${Number(gasto.monto).toLocaleString('es-AR')}</TableCell>
                 <TableCell align="center">
-                  {/* CONECTAMOS LOS BOTONES A LAS FUNCIONES */}
                   <Button size="small" color="secondary" onClick={() => handleAbrirEditar(gasto)}>Editar</Button>
                   <Button size="small" color="error" onClick={() => handleBorrar(gasto.id)}>Borrar</Button>
                 </TableCell>
@@ -149,7 +142,6 @@ const ListaGastos = () => {
       </TableContainer>
 
       <Dialog open={openModal} onClose={handleCerrarModal} fullWidth maxWidth="sm">
-        {/* Cambiamos el título dependiendo de si editamos o creamos */}
         <DialogTitle>{idEnEdicion ? 'Editar Gasto' : 'Registrar Nuevo Gasto'}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -172,7 +164,6 @@ const ListaGastos = () => {
         <DialogActions>
           <Button onClick={handleCerrarModal} color="error">Cancelar</Button>
           <Button variant="contained" color="primary" onClick={handleGuardar}>
-            {/* Cambiamos el texto del botón también */}
             {idEnEdicion ? 'Actualizar' : 'Guardar'}
           </Button>
         </DialogActions>

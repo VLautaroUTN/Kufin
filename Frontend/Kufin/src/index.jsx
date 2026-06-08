@@ -1,5 +1,8 @@
 import { createRoot } from 'react-dom/client';
 
+// 1. Importamos el Provider de Google
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 // project imports
 import App from 'App';
 import * as serviceWorker from 'serviceWorker';
@@ -25,14 +28,19 @@ import '@fontsource/poppins/500.css';
 import '@fontsource/poppins/600.css';
 import '@fontsource/poppins/700.css';
 
+// 2. Tu Client ID de Google
+const GOOGLE_CLIENT_ID = "385747106173-4p6cht7sgq9h3q23jg459fdjlkb5omph.apps.googleusercontent.com";
+
 // ==============================|| REACT DOM RENDER ||============================== //
 
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
-  <ConfigProvider>
-    <App />
-  </ConfigProvider>
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <ConfigProvider>
+      <App />
+    </ConfigProvider>
+  </GoogleOAuthProvider>
 );
 
 // If you want your app to work offline and load faster, you can change

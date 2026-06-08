@@ -10,6 +10,9 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 // -------------- GASTOS --------------
 const ListaGastos = Loadable(lazy(() => import('views/gastos/ListaGastos')));
 
+// ------------------- LOGIN ------------------
+const LoginKufin = Loadable(lazy(() => import('views/login/LoginKufin')));
+
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
@@ -41,6 +44,10 @@ const MainRoutes = {
     {
       path: 'gastos',
       element: <ListaGastos />
+    },
+    {
+      path: 'login',
+      element: <LoginKufin />
     },
     // ------------------------------------------
     {
