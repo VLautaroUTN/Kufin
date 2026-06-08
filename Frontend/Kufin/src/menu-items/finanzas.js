@@ -5,7 +5,6 @@ const icons = { IconReceipt2 };
 
 const finanzas = {
   id: 'finanzas',
-  title: 'Gestión Financiera',
   type: 'group',
   children: [
     {

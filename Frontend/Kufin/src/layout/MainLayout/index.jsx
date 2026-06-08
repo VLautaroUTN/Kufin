@@ -9,11 +9,9 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 
 // project imports
-import Footer from './Footer';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import MainContentStyled from './MainContentStyled';
-import Customization from '../Customization';
 import Loader from 'ui-component/Loader';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 
@@ -62,10 +60,8 @@ export default function MainLayout() {
           {/* breadcrumb */}
           <Breadcrumbs />
           <Outlet />
-          <Footer />
         </Box>
       </MainContentStyled>
-      <Customization />
     </Box>
   );
 }

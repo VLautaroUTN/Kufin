@@ -5,9 +5,11 @@ import { Grid, Typography, Paper } from '@mui/material';
 const LoginKufin = () => {
 
   const respuestaExitosa = (respuestaGoogle) => {
+    /*
     // Acá Google nos devuelve un "credential" (un JWT gigante)
     console.log("¡Éxito! Este es el token de Google:", respuestaGoogle.credential);
     // En el próximo paso, enviaremos este token a NestJS
+    */
   };
 
   const respuestaError = () => {
