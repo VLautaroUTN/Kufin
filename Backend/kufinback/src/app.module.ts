@@ -5,6 +5,7 @@ import { GastosModule } from './gastos/gastos.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { GruposModule } from './grupos/grupos.module';
 
 @Module({
   imports: [GastosModule, TypeOrmModule.forRoot({
@@ -17,7 +18,9 @@ import { UsuariosModule } from './usuarios/usuarios.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'], // Le decimos dónde están las entidades
       autoLoadEntities: true, // Magia: carga las entidades automáticamente
       synchronize: true, // Útil para desarrollo: crea las tablas por nosotros
-    }), AuthModule, UsuariosModule,],
+    }), 
+    AuthModule, 
+    UsuariosModule, GruposModule,],
 
   controllers: [AppController],
   providers: [AppService],
