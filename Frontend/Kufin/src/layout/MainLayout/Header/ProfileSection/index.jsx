@@ -18,6 +18,7 @@ import Box from '@mui/material/Box';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import useConfig from 'hooks/useConfig';
+import { useNavigate } from 'react-router-dom';
 
 // assets
 import User1 from 'assets/images/users/user-round.svg';
@@ -27,6 +28,7 @@ import { IconLogout, IconSettings } from '@tabler/icons-react';
 
 export default function ProfileSection() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const {
     state: { borderRadius }
   } = useConfig();
@@ -48,6 +50,12 @@ export default function ProfileSection() {
     }
 
     setOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('kufin_usuario_id');
+    localStorage.removeItem('kufin_usuario_email');
+    navigate('/login');
   };
 
   const prevOpen = useRef(open);
@@ -115,7 +123,7 @@ export default function ProfileSection() {
                           borderRadius: `${borderRadius}px`
                         }}
                       >
-                        <ListItemButton sx={{ borderRadius: `${borderRadius}px` }}>
+                        <ListItemButton sx={{ borderRadius: `${borderRadius}px` }} onClick={handleLogout}>
                           <ListItemIcon>
                             <IconLogout stroke={1.5} size="20px" />
                           </ListItemIcon>

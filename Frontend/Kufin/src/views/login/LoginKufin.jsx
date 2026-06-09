@@ -1,19 +1,34 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { Grid, Typography, Paper } from '@mui/material';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginKufin = () => {
+  const navigate = useNavigate();
 
-  const respuestaExitosa = (respuestaGoogle) => {
-    /*
-    // Acá Google nos devuelve un "credential" (un JWT gigante)
-    console.log("¡Éxito! Este es el token de Google:", respuestaGoogle.credential);
-    // En el próximo paso, enviaremos este token a NestJS
-    */
+  const respuestaExitosa = async (respuestaGoogle) => {
+    try {
+      // Enviamos el token de Google a NestJS
+      const response = await axios.post('http://localhost:3000/auth/google', {
+        token: respuestaGoogle.credential
+      });
+
+      // Guardamos la información del usuario en localStorage
+      localStorage.setItem('kufin_usuario_id', response.data.usuarioId);
+      localStorage.setItem('kufin_usuario_email', response.data.email);
+
+      // Redireccionamos al panel principal
+      navigate('/dashboard/default');
+    } catch (error) {
+      console.error("Error al autenticar con el servidor:", error);
+      alert("Error al iniciar sesión con el servidor");
+    }
   };
 
   const respuestaError = () => {
     console.error("Hubo un error al intentar iniciar sesión con Google.");
+    alert("Hubo un error al intentar iniciar sesión con Google.");
   };
 
   return (
