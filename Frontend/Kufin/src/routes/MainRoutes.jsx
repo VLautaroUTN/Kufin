@@ -10,9 +10,6 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 // -------------- GASTOS --------------
 const ListaGastos = Loadable(lazy(() => import('views/gastos/ListaGastos')));
 
-// ------------------- LOGIN ------------------
-const LoginKufin = Loadable(lazy(() => import('views/login/LoginKufin')));
-
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -37,10 +34,7 @@ const MainRoutes = {
       path: 'gastos',
       element: <ListaGastos />
     },
-    {
-      path: 'login',
-      element: <LoginKufin />
-    }
+
   ]
 };
 
