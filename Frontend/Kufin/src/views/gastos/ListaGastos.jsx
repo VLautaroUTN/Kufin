@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button,
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, MenuItem
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, MenuItem,
+  Checkbox, FormControlLabel
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -22,7 +23,9 @@ const estadoInicialFormulario = {
   fecha: obtenerFechaActual(), 
   monto: '', 
   descripcion: '', 
-  categoria: 'Pendiente de clasificar' 
+  categoria: 'Pendiente de clasificar',
+  esCuotas: false,
+  cuotasTotales: 3
 };
 
 const ListaGastos = () => {
@@ -79,6 +82,8 @@ const ListaGastos = () => {
       const datosParaEnviar = {
         ...formulario,
         monto: Number(formulario.monto), 
+        esCuotas: !idEnEdicion ? formulario.esCuotas : undefined,
+        cuotasTotales: (!idEnEdicion && formulario.esCuotas) ? Number(formulario.cuotasTotales) : undefined,
         usuarioId: usuarioIdReal || 'no-logueado'     
       };
 
@@ -87,7 +92,13 @@ const ListaGastos = () => {
         setGastos(gastos.map(g => g.id === idEnEdicion ? respuesta.data : g));
       } else {
         const respuesta = await axios.post('http://localhost:3000/gastos', datosParaEnviar);
-        setGastos([...gastos, respuesta.data]);
+        // Si el backend retornó un conjunto de cuotas o creamos múltiples registros, cargamos de nuevo todos para estar seguros
+        if (formulario.esCuotas) {
+          const respuestaCompleta = await axios.get('http://localhost:3000/gastos');
+          setGastos(respuestaCompleta.data);
+        } else {
+          setGastos([...gastos, respuesta.data]);
+        }
       }
       
       handleCerrarModal();
@@ -99,11 +110,30 @@ const ListaGastos = () => {
     }
   };
 
-  const handleBorrar = async (id) => {
+  const handleBorrar = async (gasto) => {
     if (window.confirm("¿Estás seguro de que querés eliminar este gasto?")) {
       try {
-        await axios.delete(`http://localhost:3000/gastos/${id}`);
-        setGastos(gastos.filter(g => g.id !== id));
+        let eliminarTodoElGrupo = false;
+        if (gasto.grupoCuotaId) {
+          eliminarTodoElGrupo = window.confirm(
+            "Este gasto forma parte de una compra en cuotas.\n\n" +
+            "¿Querés eliminar también todas las demás cuotas asociadas a esta compra?\n\n" +
+            "• Hacé clic en ACEPTAR para eliminar TODAS las cuotas.\n" +
+            "• Hacé clic en CANCELAR para eliminar SOLO esta cuota."
+          );
+        }
+
+        const url = eliminarTodoElGrupo 
+          ? `http://localhost:3000/gastos/${gasto.id}?eliminarTodoElGrupo=true`
+          : `http://localhost:3000/gastos/${gasto.id}`;
+
+        const respuesta = await axios.delete(url);
+
+        if (eliminarTodoElGrupo && respuesta.data.deletedAll) {
+          setGastos(gastos.filter(g => g.grupoCuotaId !== gasto.grupoCuotaId));
+        } else {
+          setGastos(gastos.filter(g => g.id !== gasto.id));
+        }
       } catch (error) {
         console.error("Error al borrar:", error);
         alert("Hubo un error al intentar borrar el gasto.");
@@ -133,7 +163,7 @@ const ListaGastos = () => {
                 <TableCell align="right">${Number(gasto.monto).toLocaleString('es-AR')}</TableCell>
                 <TableCell align="center">
                   <Button size="small" color="secondary" onClick={() => handleAbrirEditar(gasto)}>Editar</Button>
-                  <Button size="small" color="error" onClick={() => handleBorrar(gasto.id)}>Borrar</Button>
+                  <Button size="small" color="error" onClick={() => handleBorrar(gasto)}>Borrar</Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -159,6 +189,35 @@ const ListaGastos = () => {
                 {categorias.map((opcion) => ( <MenuItem key={opcion} value={opcion}>{opcion}</MenuItem> ))}
               </TextField>
             </Grid>
+            {!idEnEdicion && (
+              <>
+                <Grid item xs={12} sm={6} style={{ display: 'flex', alignItems: 'center' }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formulario.esCuotas || false}
+                        onChange={(e) => setFormulario({ ...formulario, esCuotas: e.target.checked })}
+                        color="primary"
+                      />
+                    }
+                    label="¿Es en cuotas?"
+                  />
+                </Grid>
+                {formulario.esCuotas && (
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label="Cantidad de cuotas"
+                      name="cuotasTotales"
+                      value={formulario.cuotasTotales}
+                      onChange={handleChange}
+                      inputProps={{ min: 2 }}
+                    />
+                  </Grid>
+                )}
+              </>
+            )}
           </Grid>
         </DialogContent>
         <DialogActions>

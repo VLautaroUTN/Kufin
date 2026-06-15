@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsNotEmpty, IsDateString, IsPositive } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsDateString, IsPositive, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateGastoDto {
   @IsNumber({ maxDecimalPlaces: 2 })
@@ -21,4 +21,14 @@ export class CreateGastoDto {
   @IsString()
   @IsNotEmpty()
   usuarioId!: string;
+
+  //Compras en cuotas
+  @IsBoolean()
+  @IsOptional()
+  esCuotas?: boolean;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  cuotasTotales?: number;
 }

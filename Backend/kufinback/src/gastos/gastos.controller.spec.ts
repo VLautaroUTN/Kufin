@@ -5,10 +5,23 @@ import { GastosService } from './gastos.service';
 describe('GastosController', () => {
   let controller: GastosController;
 
+  const mockGastosService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [GastosController],
-      providers: [GastosService],
+      providers: [
+        {
+          provide: GastosService,
+          useValue: mockGastosService,
+        },
+      ],
     }).compile();
 
     controller = module.get<GastosController>(GastosController);

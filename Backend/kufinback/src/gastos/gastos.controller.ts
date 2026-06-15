@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { GastosService } from './gastos.service';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
@@ -28,7 +28,10 @@ export class GastosController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.gastosService.remove(id); 
+  remove(
+    @Param('id') id: string,
+    @Query('eliminarTodoElGrupo') eliminarTodoElGrupo?: string
+  ) {
+    return this.gastosService.remove(id, eliminarTodoElGrupo === 'true'); 
   }
 }

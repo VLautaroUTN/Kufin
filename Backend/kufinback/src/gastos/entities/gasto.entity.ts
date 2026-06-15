@@ -23,4 +23,12 @@ export class Gasto {
 
   @CreateDateColumn()
   fechaDeCarga!: Date; // Se llena solo para saber en qué momento usaron la app
+
+  //Compras en cuotas
+  @Column({ nullable: true })
+  grupoCuotaId?: string;
+  @Column({ type: 'int', nullable: true })
+  cuotaNumero?: number;
+  @Column({ type: 'int', nullable: true })
+  cuotasTotales?: number;
 }
