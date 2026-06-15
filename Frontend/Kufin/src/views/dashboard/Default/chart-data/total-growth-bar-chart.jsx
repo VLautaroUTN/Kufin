@@ -11,13 +11,26 @@ const chartOptions = {
   plotOptions: {
     bar: {
       horizontal: false,
-      columnWidth: '50%'
+      columnWidth: '50%',
+      dataLabels: {
+        total: {
+          enabled: true,
+          style: {
+            fontSize: '11px',
+            fontWeight: 700
+          },
+          formatter: function (val) {
+            if (!val || val === 0) return '';
+            return '$' + Number(val).toLocaleString('es-AR', { maximumFractionDigits: 0 });
+          }
+        }
+      }
     }
   },
   dataLabels: { enabled: false },
   xaxis: {
     type: 'category',
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
   },
   fill: { type: 'solid' },
   legend: {
