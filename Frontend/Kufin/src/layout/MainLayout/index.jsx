@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -21,6 +21,14 @@ import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 // ==============================|| MAIN LAYOUT ||============================== //
 
 export default function MainLayout() {
+  const navigate = useNavigate();
+  const usuarioId = localStorage.getItem('kufin_usuario_id');
+
+  useEffect(() => {
+    if (!usuarioId) {
+      navigate('/pages/login');
+    }
+  }, [usuarioId, navigate]);
   const theme = useTheme();
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -39,6 +47,8 @@ export default function MainLayout() {
   }, [downMD]);
 
   // horizontal menu-list bar : drawer
+
+  if (!usuarioId) return <Loader />;
 
   if (menuMasterLoading) return <Loader />;
 

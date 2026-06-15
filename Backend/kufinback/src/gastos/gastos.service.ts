@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateGastoDto } from './dto/create-gasto.dto';
@@ -15,6 +15,9 @@ export class GastosService {
 
   // CREAR: Toma los datos del DTO y los guarda en la base de datos (soporta cuotas)
   async create(createGastoDto: CreateGastoDto) {
+    if (!createGastoDto.usuarioId || createGastoDto.usuarioId === 'no-logueado') {
+      throw new UnauthorizedException('Usuario no válido o no logueado');
+    }
     const { esCuotas, cuotasTotales, monto, fecha, descripcion, ...resto } = createGastoDto;
 
     if (esCuotas && cuotasTotales && cuotasTotales > 1) {
@@ -54,8 +57,12 @@ export class GastosService {
   }
 
   // LEER TODOS: Trae todos los gastos ordenados por fecha (los más nuevos primero)
-  async findAll() {
+  async findAll(usuarioId?: string) {
+    if (!usuarioId || usuarioId === 'no-logueado') {
+      return [];
+    }
     return await this.gastoRepository.find({
+      where: { usuarioId },
       order: { fecha: 'DESC' },
     });
   }

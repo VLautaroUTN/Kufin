@@ -1,0 +1,55 @@
+# Restringir Acceso y Datos a Usuarios no Autenticados
+
+Asegura que un usuario debe estar logueado para interactuar con cualquier función de la app. Si no está logueado, se lo redirecciona a la pantalla de login, no se le muestra ningún dato y el backend rechaza cualquier intento de leer o registrar información.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Filtro de Datos a Nivel de Base de Datos:**
+> Además de redireccionar al usuario en el frontend, filtraremos los gastos en el backend mediante el campo `usuarioId`. Esto garantiza que los usuarios logueados solo puedan ver y guardar sus propios datos, resolviendo la seguridad de punta a punta.
+
+## Proposed Changes
+
+---
+
+### Backend (NestJS)
+
+#### [MODIFY] [gastos.controller.ts](file:///c:/Users/LauPC/Documents/Programacion/Kufin/Backend/kufinback/src/gastos/gastos.controller.ts)
+*   Modificar el método `findAll` para que reciba el query parameter `usuarioId` usando el decorador `@Query('usuarioId')`.
+
+#### [MODIFY] [gastos.service.ts](file:///c:/Users/LauPC/Documents/Programacion/Kufin/Backend/kufinback/src/gastos/gastos.service.ts)
+*   Modificar `findAll(usuarioId?: string)`: Si no se recibe `usuarioId` o es `'no-logueado'`, retornar una lista vacía `[]`. Si es válido, filtrar la consulta en la base de datos usando `where: { usuarioId }`.
+*   Modificar `create`: Agregar una verificación al inicio del método. Si `createGastoDto.usuarioId` no viene o es igual a `'no-logueado'`, lanzar una excepción `UnauthorizedException("Usuario no válido o no logueado")`.
+
+---
+
+### Frontend (React)
+
+#### [MODIFY] [MainLayout/index.jsx](file:///c:/Users/LauPC/Documents/Programacion/Kufin/Frontend/Kufin/src/layout/MainLayout/index.jsx)
+*   Importar `useNavigate` de `react-router-dom`.
+*   En un `useEffect`, comprobar si existe `kufin_usuario_id` en el `localStorage`.
+*   Si no existe, redireccionar inmediatamente al usuario a `/pages/login`. Mientras se procesa la redirección, mostrar el componente `<Loader />` para evitar parpadeos de la interfaz protegida.
+
+#### [MODIFY] [ListaGastos.jsx](file:///c:/Users/LauPC/Documents/Programacion/Kufin/Frontend/Kufin/src/views/gastos/ListaGastos.jsx)
+*   En los `useEffect` de carga de datos, verificar que `usuarioId` exista en `localStorage` antes de hacer el fetch.
+*   Modificar los llamados `axios.get('http://localhost:3000/gastos')` para incluir el parámetro `usuarioId` (ej: `http://localhost:3000/gastos?usuarioId=${usuarioIdReal}`).
+*   En `handleGuardar`, si por algún motivo no hay `usuarioIdReal`, abortar el guardado y mostrar una alerta.
+
+#### [MODIFY] [TotalGrowthBarChart.jsx](file:///c:/Users/LauPC/Documents/Programacion/Kufin/Frontend/Kufin/src/views/dashboard/Default/TotalGrowthBarChart.jsx)
+*   En el `useEffect` de carga inicial, verificar que `usuarioId` exista en `localStorage` antes de hacer el fetch.
+*   Modificar el llamado `axios.get('http://localhost:3000/gastos')` para incluir el parámetro `usuarioId` (ej: `http://localhost:3000/gastos?usuarioId=${usuarioId}`).
+
+## Verification Plan
+
+### Manual Verification
+1.  **Caso Sin Sesión Iniciada:**
+    *   Borrar el localStorage (`localStorage.clear()`).
+    *   Intentar ingresar directamente a `http://localhost:5173/` o `http://localhost:5173/gastos`.
+    *   Comprobar que redirige automáticamente a `http://localhost:5173/pages/login` y no muestra el layout del dashboard.
+    *   Probar llamadas HTTP manuales a `GET http://localhost:3000/gastos` y verificar que devuelvan `[]` (vacío).
+    *   Probar llamadas HTTP manuales a `POST http://localhost:3000/gastos` con `usuarioId: 'no-logueado'` y comprobar que el backend las rechace con un error `401 Unauthorized`.
+2.  **Caso Con Sesión Iniciada:**
+    *   Iniciar sesión con el botón de Google.
+    *   Verificar que se redirige correctamente a `/dashboard/default`.
+    *   Comprobar que se cargan únicamente los gastos del usuario activo.
+    *   Registrar un nuevo gasto y verificar que se guarde con el ID del usuario actual.

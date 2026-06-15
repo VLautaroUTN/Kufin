@@ -13,8 +13,8 @@ export class GastosController {
   }
 
   @Get()
-  findAll() {
-    return this.gastosService.findAll();
+  findAll(@Query('usuarioId') usuarioId?: string) {
+    return this.gastosService.findAll(usuarioId);
   }
 
   @Get(':id')

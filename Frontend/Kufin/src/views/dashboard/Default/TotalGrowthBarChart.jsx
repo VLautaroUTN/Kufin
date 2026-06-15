@@ -53,10 +53,16 @@ export default function TotalGrowthBarChart({ isLoading }) {
 
   // 1. Cargar todos los gastos desde la API al montar el componente
   useEffect(() => {
+    const usuarioId = localStorage.getItem('kufin_usuario_id');
+    if (!usuarioId) {
+      setIsDataLoading(false);
+      return;
+    }
+
     const cargarGastos = async () => {
       try {
         setIsDataLoading(true);
-        const respuesta = await axios.get('http://localhost:3000/gastos');
+        const respuesta = await axios.get(`http://localhost:3000/gastos?usuarioId=${usuarioId}`);
         const listaGastos = respuesta.data;
         setGastos(listaGastos);
         

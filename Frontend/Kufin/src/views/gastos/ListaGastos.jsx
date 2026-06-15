@@ -35,9 +35,12 @@ const ListaGastos = () => {
   const [idEnEdicion, setIdEnEdicion] = useState(null);
 
   useEffect(() => {
+    const usuarioId = localStorage.getItem('kufin_usuario_id');
+    if (!usuarioId) return;
+
     const cargarGastos = async () => {
       try {
-        const respuesta = await axios.get('http://localhost:3000/gastos');
+        const respuesta = await axios.get(`http://localhost:3000/gastos?usuarioId=${usuarioId}`);
         setGastos(respuesta.data); 
       } catch (error) {
         console.error("Error al cargar los gastos:", error);
@@ -76,15 +79,18 @@ const ListaGastos = () => {
 
   const handleGuardar = async () => {
     try {
-
       const usuarioIdReal = localStorage.getItem('kufin_usuario_id');
+      if (!usuarioIdReal) {
+        alert("Debés iniciar sesión para registrar gastos.");
+        return;
+      }
 
       const datosParaEnviar = {
         ...formulario,
         monto: Number(formulario.monto), 
         esCuotas: !idEnEdicion ? formulario.esCuotas : undefined,
         cuotasTotales: (!idEnEdicion && formulario.esCuotas) ? Number(formulario.cuotasTotales) : undefined,
-        usuarioId: usuarioIdReal || 'no-logueado'     
+        usuarioId: usuarioIdReal     
       };
 
       if (idEnEdicion) {
@@ -94,7 +100,7 @@ const ListaGastos = () => {
         const respuesta = await axios.post('http://localhost:3000/gastos', datosParaEnviar);
         // Si el backend retornó un conjunto de cuotas o creamos múltiples registros, cargamos de nuevo todos para estar seguros
         if (formulario.esCuotas) {
-          const respuestaCompleta = await axios.get('http://localhost:3000/gastos');
+          const respuestaCompleta = await axios.get(`http://localhost:3000/gastos?usuarioId=${usuarioIdReal}`);
           setGastos(respuestaCompleta.data);
         } else {
           setGastos([...gastos, respuesta.data]);
