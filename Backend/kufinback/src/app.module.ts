@@ -11,11 +11,11 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [GastosModule, TypeOrmModule.forRoot({
     type: 'postgres',
-    host: 'localhost', // O la URL que nos dé Neon/Supabase
-    port: 5432,
-    username: 'postgres',
-    password: '0304',
-    database: 'kufin_db',
+    host: process.env.DB_HOST, // O la URL que nos dé Neon/Supabase
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     entities: [__dirname + '/**/*.entity{.ts,.js}'], // Le decimos dónde están las entidades
     autoLoadEntities: true, // Magia: carga las entidades automáticamente
     synchronize: true, // Útil para desarrollo: crea las tablas por nosotros
