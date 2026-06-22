@@ -18,6 +18,9 @@ import { ConfigModule } from '@nestjs/config';
     database: process.env.DB_NAME,
     entities: [__dirname + '/**/*.entity{.ts,.js}'], // Le decimos dónde están las entidades
     autoLoadEntities: true, // Magia: carga las entidades automáticamente
+    ssl: {
+    rejectUnauthorized: false, // Necesario para Render
+  },
     synchronize: true, // Útil para desarrollo: crea las tablas por nosotros
   }),
     AuthModule,
