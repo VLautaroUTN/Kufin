@@ -6,28 +6,35 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { GruposModule } from './grupos/grupos.module';
-import { ConfigModule } from '@nestjs/config';
-
+import { ConfigModule, ConfigService } from '@nestjs/config';
 @Module({
-  imports: [GastosModule, TypeOrmModule.forRoot({
-    type: 'postgres',
-    host: process.env.DB_HOST, // O la URL que nos dé Neon/Supabase
-    port: 5432,
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    entities: [__dirname + '/**/*.entity{.ts,.js}'], // Le decimos dónde están las entidades
-    autoLoadEntities: true, // Magia: carga las entidades automáticamente
-    ssl: {
-    rejectUnauthorized: false, // Necesario para Render
-  },
-    synchronize: true, // Útil para desarrollo: crea las tablas por nosotros
-  }),
-    AuthModule,
-    UsuariosModule, GruposModule,
+  imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Esto hace que no tengas que importar ConfigModule en cada módulo
-    }),],
+      isGlobal: true,
+    }),
+    GastosModule,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('DB_HOST'), // Se usa la URL completa
+        // port: configService.get<number>('DB_PORT'), // Opcional si usas url
+        // username: configService.get<string>('DB_USER'), // Opcional si usas url
+        // password: configService.get<string>('DB_PASSWORD'), // Opcional si usas url
+        // database: configService.get<string>('DB_NAME'), // Opcional si usas url
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
+        synchronize: true,
+        ssl: {
+          rejectUnauthorized: false, // Requerido por Render.com para conexiones externas
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    UsuariosModule,
+    GruposModule,
+  ],
 
   controllers: [AppController],
   providers: [AppService],
