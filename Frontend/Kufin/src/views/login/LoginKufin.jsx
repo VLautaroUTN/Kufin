@@ -10,7 +10,8 @@ const LoginKufin = () => {
   const respuestaExitosa = async (respuestaGoogle) => {
     try {
       // Enviamos el token de Google a NestJS
-      const response = await axios.post('http://localhost:3000/auth/google', {
+      const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+      const response = await axios.post(`${API_URL}/auth/google`, {
         token: respuestaGoogle.credential
       });
 
