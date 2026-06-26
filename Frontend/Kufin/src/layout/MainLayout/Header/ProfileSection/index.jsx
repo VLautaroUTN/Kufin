@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { GoogleLogin } from '@react-oauth/google';
@@ -30,6 +32,9 @@ import { IconLogout } from '@tabler/icons-react';
 // ==============================|| PROFILE MENU ||============================== //
 
 export default function ProfileSection() {
+
+  const navigate = useNavigate();
+
   const theme = useTheme();
   const {
     state: { borderRadius }
@@ -70,6 +75,7 @@ export default function ProfileSection() {
     localStorage.removeItem('kufin_usuario_foto');
     setUsuario(null);
     setOpen(false);
+    navigate('/pages/login');
   };
 
   const handleLoginExitoso = async (respuestaGoogle) => {

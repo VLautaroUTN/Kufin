@@ -11,6 +11,7 @@ async function bootstrap() {
     forbidNonWhitelisted: true, // Tira un error si alguien intenta mandar campos inventados
   }));
 
-  await app.listen(process.env.PORT ?? 3000);
+  //await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT || 3000, '0.0.0.0');
 }
 bootstrap();
