@@ -7,6 +7,8 @@ import {
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+
 // 1. Agregamos la nueva categoría a la lista de opciones
 const categorias = ['Pendiente de clasificar', 'Alimentos', 'Servicios', 'Transporte', 'Ocio', 'Otros'];
 
@@ -40,7 +42,7 @@ const ListaGastos = () => {
 
     const cargarGastos = async () => {
       try {
-        const respuesta = await axios.get(`http://localhost:3000/gastos?usuarioId=${usuarioId}`);
+        const respuesta = await axios.get(`${API_URL}/gastos?usuarioId=${usuarioId}`);
         setGastos(respuesta.data); 
       } catch (error) {
         console.error("Error al cargar los gastos:", error);
@@ -94,13 +96,13 @@ const ListaGastos = () => {
       };
 
       if (idEnEdicion) {
-        const respuesta = await axios.patch(`http://localhost:3000/gastos/${idEnEdicion}`, datosParaEnviar);
+        const respuesta = await axios.patch(`${API_URL}/gastos/${idEnEdicion}`, datosParaEnviar);
         setGastos(gastos.map(g => g.id === idEnEdicion ? respuesta.data : g));
       } else {
-        const respuesta = await axios.post('http://localhost:3000/gastos', datosParaEnviar);
+        const respuesta = await axios.post(`${API_URL}/gastos`, datosParaEnviar);
         // Si el backend retornó un conjunto de cuotas o creamos múltiples registros, cargamos de nuevo todos para estar seguros
         if (formulario.esCuotas) {
-          const respuestaCompleta = await axios.get(`http://localhost:3000/gastos?usuarioId=${usuarioIdReal}`);
+          const respuestaCompleta = await axios.get(`${API_URL}/gastos?usuarioId=${usuarioIdReal}`);
           setGastos(respuestaCompleta.data);
         } else {
           setGastos([...gastos, respuesta.data]);
@@ -130,8 +132,8 @@ const ListaGastos = () => {
         }
 
         const url = eliminarTodoElGrupo 
-          ? `http://localhost:3000/gastos/${gasto.id}?eliminarTodoElGrupo=true`
-          : `http://localhost:3000/gastos/${gasto.id}`;
+          ? `${API_URL}/gastos/${gasto.id}?eliminarTodoElGrupo=true`
+          : `${API_URL}/gastos/${gasto.id}`;
 
         const respuesta = await axios.delete(url);
 

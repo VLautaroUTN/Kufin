@@ -80,7 +80,8 @@ export default function ProfileSection() {
 
   const handleLoginExitoso = async (respuestaGoogle) => {
     try {
-      const response = await axios.post('http://localhost:3000/auth/google', {
+      const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+      const response = await axios.post(`${API_URL}/auth/google`, {
         token: respuestaGoogle.credential
       });
 

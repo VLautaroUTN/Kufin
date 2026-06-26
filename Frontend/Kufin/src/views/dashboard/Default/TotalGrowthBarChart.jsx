@@ -62,7 +62,8 @@ export default function TotalGrowthBarChart({ isLoading }) {
     const cargarGastos = async () => {
       try {
         setIsDataLoading(true);
-        const respuesta = await axios.get(`http://localhost:3000/gastos?usuarioId=${usuarioId}`);
+        const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+        const respuesta = await axios.get(`${API_URL}/gastos?usuarioId=${usuarioId}`);
         const listaGastos = respuesta.data;
         setGastos(listaGastos);
         
