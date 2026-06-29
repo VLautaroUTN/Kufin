@@ -15,20 +15,34 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     GastosModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.get<string>('DB_HOST'), // Se usa la URL completa
-        // port: configService.get<number>('DB_PORT'), // Opcional si usas url
-        // username: configService.get<string>('DB_USER'), // Opcional si usas url
-        // password: configService.get<string>('DB_PASSWORD'), // Opcional si usas url
-        // database: configService.get<string>('DB_NAME'), // Opcional si usas url
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        autoLoadEntities: true,
-        synchronize: true,
-        ssl: {
-          rejectUnauthorized: false, // Requerido por Render.com para conexiones externas
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+        
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            autoLoadEntities: true,
+            synchronize: true,
+            ssl: {
+              rejectUnauthorized: false, // Requerido por Render.com para conexiones externas
+            },
+          };
+        }
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          username: configService.get<string>('DB_USER'),
+          password: configService.get<string>('DB_PASSWORD'),
+          database: configService.get<string>('DB_NAME'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
       inject: [ConfigService],
     }),
     AuthModule,
