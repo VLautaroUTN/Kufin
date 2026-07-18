@@ -41,10 +41,12 @@ export function LoginModal({ open, onClose, onLoginSuccess }: LoginModalProps) {
     setLoading(true);
     setError('');
 
-    // Simulate network latency
+    // TODO(Backend): Reemplazar el setTimeout por una petición real (ej. fetch('/api/login', { method: 'POST', body: { email, password } }))
+    // Si la respuesta es exitosa, se guarda el token y se llama a onLoginSuccess.
+    // Si falla, se muestra el error devuelto por la API mediante setError().
     setTimeout(() => {
       setLoading(false);
-      onLoginSuccess('Lautaro');
+      onLoginSuccess('Lautaro'); // El nombre debería venir de la respuesta del backend
       onClose();
     }, 1200);
   };

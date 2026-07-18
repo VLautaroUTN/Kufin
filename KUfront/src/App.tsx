@@ -89,7 +89,8 @@ export function App() {
     severity: 'success',
   });
 
-  // Pre-populated transactions for initial dashboard load
+  // TODO(Backend): Reemplazar este estado estático por un fetch al backend al cargar el componente.
+  // Ejemplo: useEffect(() => { fetch('/api/transactions').then(...) }, [])
   const [transactions, setTransactions] = useState<Transaction[]>([
     { id: 1, type: 'ingreso', amount: 350000, category: 'Sueldo', date: '2026-07-01', description: 'Salario Mensual UTN' },
     { id: 2, type: 'egreso', amount: 120000, category: 'Alquiler', date: '2026-07-05', description: 'Alquiler Departamento' },
@@ -100,6 +101,8 @@ export function App() {
   ]);
 
   const handleLoginSuccess = (name: string) => {
+    // TODO(Backend): Aquí se debería guardar el token de autenticación devuelto por el backend
+    // (por ejemplo en localStorage o cookies) y setear el estado del usuario.
     setUsername(name);
     showToast(`¡Sesión iniciada con éxito! Bienvenido, ${name}.`, 'success');
   };
@@ -110,15 +113,20 @@ export function App() {
   };
 
   const handleAddTransaction = (newTx: Omit<Transaction, 'id'>) => {
+    // TODO(Backend): Enviar `newTx` a la API mediante un POST. 
+    // Una vez que el backend responda con éxito (y devuelva el ID real creado en la DB),
+    // se actualiza el estado local de transacciones.
     const tx: Transaction = {
       ...newTx,
-      id: Date.now(), // Unique ID based on timestamp
+      id: Date.now(), // Sustituir por el ID que devuelva el backend
     };
     setTransactions((prev) => [tx, ...prev]);
     showToast('Movimiento registrado correctamente.', 'success');
   };
 
   const handleDeleteTransaction = (id: number) => {
+    // TODO(Backend): Llamar al endpoint de eliminación (ej: DELETE /api/transactions/:id).
+    // Si la respuesta es exitosa, se elimina del estado local.
     setTransactions((prev) => prev.filter((tx) => tx.id !== id));
     showToast('Movimiento eliminado.', 'warning');
   };
