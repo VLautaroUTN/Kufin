@@ -12,7 +12,7 @@ import { Sidebar } from './components/Dashboard/Sidebar';
 import { DashboardHome } from './components/Dashboard/DashboardHome';
 import { Transactions } from './components/Dashboard/Transactions';
 import { Reports } from './components/Dashboard/Reports';
-import { LoginModal } from './components/Dashboard/LoginModal';
+import { LoginModal } from './components/Login';
 
 // 1. Create a customized premium dark theme matching the design guidelines
 const darkTheme = createTheme({
