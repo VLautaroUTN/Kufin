@@ -18,33 +18,17 @@ import {
     VisibilityOffRounded,
 } from '@mui/icons-material';
 
+import { GoogleLogin } from '@react-oauth/google';
+
 export interface LoginViewProps {
     open: boolean;
     onClose: (() => void) | undefined;
-    email: string;
-    setEmail: (val: string) => void;
-    password: string;
-    setPassword: (val: string) => void;
-    showPassword: boolean;
-    setShowPassword: (val: boolean) => void;
+    onGoogleSuccess: (response: any) => void;
+    onGoogleError: () => void;
     loading: boolean;
-    error: string;
-    handleSubmit: (e: React.FormEvent) => void;
 }
 
-export default function Login({
-    open,
-    onClose,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    showPassword,
-    setShowPassword,
-    loading,
-    error,
-    handleSubmit,
-}: LoginViewProps) {
+export default function Login({ open, onClose, onGoogleSuccess, onGoogleError, loading }: LoginViewProps) {
     return (
         <Dialog
             open={open}
@@ -147,141 +131,39 @@ export default function Login({
                         Ingresa a tu cuenta para gestionar tus finanzas
                     </Typography>
                 </Box>
+                {/* Contenedor de Google Login */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mt: 4,
+                        // Limitamos el ancho para que el botón no se expanda innecesariamente
+                        width: 'fit-content',
+                        mx: 'auto',
 
-                <Box component="form" onSubmit={handleSubmit}>
-                    {error && (
-                        <Box
-                            sx={{
-                                mb: 2,
-                                p: 1.5,
-                                bgcolor: 'rgba(239, 68, 68, 0.1)',
-                                border: '1px solid rgba(239, 68, 68, 0.2)',
-                                borderRadius: 2,
-                            }}
-                        >
-                            <Typography variant="caption" sx={{ color: '#F87171', display: 'block', textAlign: 'center' }}>
-                                {error}
-                            </Typography>
-                        </Box>
-                    )}
+                        // Estilos para el fondo blanco y esquinas redondeadas
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '25px', // Redondez pronunciada para un look suave
+                        padding: '2px',       // Ajuste fino del espacio
+                        overflow: 'hidden',   // Asegura que no se salga del redondeo
 
-                    <TextField
-                        fullWidth
-                        label="Correo Electrónico"
-                        variant="outlined"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading}
-                        margin="normal"
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
-                                        <EmailRounded fontSize="small" />
-                                    </InputAdornment>
-                                ),
-                            },
-                        }}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                color: '#FFFFFF',
-                                borderRadius: 2.5,
-                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                transition: 'all 0.3s ease',
-                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                '&.Mui-focused fieldset': { borderColor: '#6366F1' },
-                            },
-                            '& .MuiInputLabel-root': {
-                                color: 'rgba(255, 255, 255, 0.4)',
-                                '&.Mui-focused': { color: '#6366F1' },
-                            },
-                        }}
+                        // Sombra suave para que destaque sobre el fondo oscuro del modal
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+
+                        // Transición para suavizar el aspecto al interactuar
+                        transition: 'transform 0.2s ease',
+                        '&:hover': {
+                            transform: 'scale(1.02)',
+                        }
+                    }}
+                >
+                    <GoogleLogin
+                        onSuccess={onGoogleSuccess}
+                        onError={onGoogleError}
+                        theme="outline" // El tema outline usa fondo blanco
+                        size="medium"   // Puedes probar 'medium' o 'small' para reducir el tamaño
+                        shape="pill"    // Ayuda a que la forma base sea más redondeada
                     />
-
-                    <TextField
-                        fullWidth
-                        label="Contraseña"
-                        variant="outlined"
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                        margin="normal"
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
-                                        <LockRounded fontSize="small" />
-                                    </InputAdornment>
-                                ),
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            edge="end"
-                                            sx={{ color: 'rgba(255, 255, 255, 0.4)' }}
-                                        >
-                                            {showPassword ? <VisibilityOffRounded fontSize="small" /> : <VisibilityRounded fontSize="small" />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
-                            },
-                        }}
-                        sx={{
-                            mb: 4,
-                            '& .MuiOutlinedInput-root': {
-                                color: '#FFFFFF',
-                                borderRadius: 2.5,
-                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                transition: 'all 0.3s ease',
-                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                '&.Mui-focused fieldset': { borderColor: '#6366F1' },
-                            },
-                            '& .MuiInputLabel-root': {
-                                color: 'rgba(255, 255, 255, 0.4)',
-                                '&.Mui-focused': { color: '#6366F1' },
-                            },
-                        }}
-                    />
-
-                    <Button
-                        fullWidth
-                        type="submit"
-                        variant="contained"
-                        disabled={loading}
-                        sx={{
-                            py: 1.5,
-                            borderRadius: 2.5,
-                            background: 'linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%)',
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.25)',
-                            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                            '&:hover': {
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 12px 24px rgba(99, 102, 241, 0.4)',
-                                background: 'linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%)',
-                            },
-                            '&:disabled': {
-                                background: 'rgba(255, 255, 255, 0.1)',
-                                color: 'rgba(255, 255, 255, 0.3)',
-                            },
-                        }}
-                    >
-                        {loading ? <CircularProgress size={24} sx={{ color: '#FFFFFF' }} /> : 'Iniciar Sesión'}
-                    </Button>
-
-                    <Box sx={{ mt: 3, textAlign: 'center' }}>
-                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>
-                            ¿No tienes cuenta?
-                            <span style={{ color: '#6366F1', cursor: 'pointer', fontWeight: 600 }}>
-                                Regístrate
-                            </span>
-                        </Typography>
-                    </Box>
                 </Box>
             </DialogContent>
         </Dialog>)

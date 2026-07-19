@@ -1,52 +1,38 @@
 import { useState } from 'react';
 import Login from './login';
+import axios from 'axios';
+//import { useNavigate } from 'react-router-dom';
 
-interface LoginModalProps {
-  open: boolean;
-  onClose: () => void;
-  onLoginSuccess: (username: string) => void;
-}
-
-export function LoginModal({ open, onClose, onLoginSuccess }: LoginModalProps) {
-  const [email, setEmail] = useState('lautaro@kufin.com');
-  const [password, setPassword] = useState('kufin2026');
-  const [showPassword, setShowPassword] = useState(false);
+export function LoginModal({ open, onClose }: LoginModalProps) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  // const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Por favor, completa todos los campos.');
-      return;
-    }
-
+  const handleGoogleSuccess = async (respuestaGoogle: any) => {
     setLoading(true);
-    setError('');
+    try {
+      const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+      const response = await axios.post(`${API_URL}/auth/google`, {
+        token: respuestaGoogle.credential
+      });
 
-    // TODO(Backend): Reemplazar el setTimeout por una petición real (ej. fetch('/api/login', { method: 'POST', body: { email, password } }))
-    // Si la respuesta es exitosa, se guarda el token y se llama a onLoginSuccess.
-    // Si falla, se muestra el error devuelto por la API mediante setError().
-    setTimeout(() => {
-      setLoading(false);
-      onLoginSuccess('Lautaro'); // El nombre debería venir de la respuesta del backend
+      localStorage.setItem('kufin_usuario_id', response.data.usuarioId);
+      localStorage.setItem('kufin_usuario_email', response.data.email);
+      //navigate('/dashboard/default');
       onClose();
-    }, 1200);
+    } catch (error) {
+      console.error("Error al autenticar:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Login
       open={open}
-      onClose={loading ? undefined : onClose}
-      email={email}
-      setEmail={setEmail}
-      password={password}
-      setPassword={setPassword}
-      showPassword={showPassword}
-      setShowPassword={setShowPassword}
+      onClose={onClose}
+      onGoogleSuccess={handleGoogleSuccess}
+      onGoogleError={() => console.error("Error en Google")}
       loading={loading}
-      error={error}
-      handleSubmit={handleSubmit}
     />
   );
 }
