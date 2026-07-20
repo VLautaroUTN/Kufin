@@ -3,19 +3,11 @@ import {
     DialogContent,
     Box,
     Typography,
-    TextField,
-    Button,
     IconButton,
-    CircularProgress,
-    InputAdornment,
 } from '@mui/material';
 
 import {
     CloseRounded,
-    EmailRounded,
-    LockRounded,
-    VisibilityRounded,
-    VisibilityOffRounded,
 } from '@mui/icons-material';
 
 import { GoogleLogin } from '@react-oauth/google';
