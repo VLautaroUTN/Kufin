@@ -1,89 +1,244 @@
+// =======================
+// Componentes de Material UI
+// =======================
 import {
-    Dialog,
-    DialogContent,
-    Box,
-    Typography,
-    IconButton,
+    Dialog,            // Ventana modal
+    DialogContent,     // Contenido principal del Dialog
+    Box,               // Contenedor genérico (equivalente a un <div> pero con soporte para "sx")
+    Typography,        // Componente para mostrar texto con estilos de Material UI
+    IconButton,    // Permite agregar iconos dentro de un TextField (no se usa actualmente)
 } from '@mui/material';
 
+// =======================
+// Iconos de Material UI
+// =======================
 import {
-    CloseRounded,
+    CloseRounded, // Icono de ocultar contraseña (no se usa actualmente)
 } from '@mui/icons-material';
 
+// Componente oficial de Google para iniciar sesión mediante OAuth
 import { GoogleLogin } from '@react-oauth/google';
 
+
+// =======================
+// Propiedades que recibirá este componente
+// =======================
 export interface LoginViewProps {
+
+    // Indica si el modal está abierto o cerrado
     open: boolean;
+
+    // Función que se ejecutará al cerrar el modal
+    // Puede ser undefined si no queremos permitir el cierre
     onClose: (() => void) | undefined;
+
+    // Función que se ejecuta cuando Google devuelve un inicio de sesión exitoso
     onGoogleSuccess: (response: any) => void;
+
+    // Función que se ejecuta cuando ocurre un error durante el login
     onGoogleError: () => void;
+
+    // Indica si se está realizando una operación de carga
     loading: boolean;
 }
 
-export default function Login({ open, onClose, onGoogleSuccess, onGoogleError, loading }: LoginViewProps) {
+
+// =======================
+// Componente Login
+// =======================
+export default function Login({
+
+    // Desestructuración de las propiedades recibidas
+    open,
+    onClose,
+    onGoogleSuccess,
+    onGoogleError,
+    loading
+
+}: LoginViewProps) {
+
     return (
+
+        // Modal principal
         <Dialog
+
+            // Controla si el modal está visible
             open={open}
+
+            // Si loading=true no dejamos cerrar el modal
             onClose={loading ? undefined : onClose}
+
+            // Ancho máximo del modal ("xs" = extra pequeño)
             maxWidth="xs"
+
+            // Hace que ocupe todo el ancho disponible hasta llegar al maxWidth
             fullWidth
+
+            // Permite personalizar el Paper interno del Dialog
             slotProps={{
                 paper: {
+
+                    // sx permite escribir estilos CSS directamente
                     sx: {
+
+                        // Fondo semitransparente
                         background: 'rgba(21, 28, 44, 0.75)',
+
+                        // Efecto vidrio (Glassmorphism)
                         backdropFilter: 'blur(20px)',
+
+                        // Compatibilidad con Safari
                         WebkitBackdropFilter: 'blur(20px)',
+
+                        // Borde blanco muy transparente
                         border: '1px solid rgba(255, 255, 255, 0.08)',
+
+                        // Bordes redondeados
                         borderRadius: 4,
-                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+
+                        // Sombra exterior + brillo interior
+                        boxShadow:
+                            '0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+
+                        // Evita que los hijos sobresalgan del borde redondeado
                         overflow: 'hidden',
                     },
                 },
             }}
         >
-            {/* Decorative top glow */}
+
+            {/* Línea decorativa superior */}
             <Box
+
                 sx={{
+
+                    // Alto de la línea
                     height: '4px',
-                    background: 'linear-gradient(90deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%)',
+
+                    // Gradiente horizontal
+                    background:
+                        'linear-gradient(90deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%)',
+
+                    // Ocupa todo el ancho
                     width: '100%',
                 }}
             />
 
-            <Box sx={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}>
+            {/* Botón para cerrar el modal */}
+            <Box
+
+                sx={{
+
+                    // Posición absoluta dentro del Dialog
+                    position: 'absolute',
+
+                    // Distancia desde arriba
+                    top: 12,
+
+                    // Distancia desde la derecha
+                    right: 12,
+
+                    // Lo coloca por encima del resto
+                    zIndex: 1,
+                }}
+            >
+
                 <IconButton
+
+                    // Al hacer click ejecuta onClose
                     onClick={onClose}
+
+                    // Si loading=true deshabilita el botón
                     disabled={loading}
+
                     sx={{
+
+                        // Color del icono
                         color: 'rgba(255, 255, 255, 0.5)',
+
+                        // Estilos cuando el mouse pasa encima
                         '&:hover': {
+
+                            // Icono completamente blanco
                             color: '#FFFFFF',
+
+                            // Fondo semitransparente
                             background: 'rgba(255, 255, 255, 0.05)',
                         },
                     }}
                 >
+
+                    {/* Icono de cerrar */}
                     <CloseRounded />
+
                 </IconButton>
+
             </Box>
 
-            <DialogContent sx={{ p: 4 }}>
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
-                    {/* SVG Abstract Logo for Modal header */}
+            {/* Contenido principal del modal */}
+            <DialogContent
+
+                sx={{
+
+                    // Padding interno
+                    p: 4,
+                }}
+            >
+
+                {/* Encabezado */}
+                <Box
+
+                    sx={{
+
+                        // Centra horizontalmente
+                        textAlign: 'center',
+
+                        // Margen inferior
+                        mb: 4,
+                    }}
+                >
+
+                    {/* Logo */}
                     <Box
+
                         sx={{
+
                             width: 50,
                             height: 50,
+
+                            // Centrado horizontal
                             mx: 'auto',
+
+                            // Margen inferior
                             mb: 2,
-                            background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+
+                            // Fondo degradado
+                            background:
+                                'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+
+                            // Bordes redondeados
                             borderRadius: '12px',
+
+                            // Flex para centrar el SVG
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: '0 8px 16px rgba(99, 102, 241, 0.3)',
+
+                            // Sombra
+                            boxShadow:
+                                '0 8px 16px rgba(99, 102, 241, 0.3)',
                         }}
                     >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+
+                        {/* Logo SVG */}
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+
+                            {/* Primera figura */}
                             <path
                                 d="M12 2L2 7L12 12L22 7L12 2Z"
                                 stroke="#FFFFFF"
@@ -91,6 +246,8 @@ export default function Login({ open, onClose, onGoogleSuccess, onGoogleError, l
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                             />
+
+                            {/* Segunda figura */}
                             <path
                                 d="M2 17L12 22L22 17"
                                 stroke="#FFFFFF"
@@ -98,6 +255,8 @@ export default function Login({ open, onClose, onGoogleSuccess, onGoogleError, l
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                             />
+
+                            {/* Tercera figura */}
                             <path
                                 d="M2 12L12 17L22 12"
                                 stroke="#FFFFFF"
@@ -105,58 +264,125 @@ export default function Login({ open, onClose, onGoogleSuccess, onGoogleError, l
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                             />
+
                         </svg>
+
                     </Box>
+
+                    {/* Título */}
                     <Typography
+
                         variant="h5"
+
                         sx={{
+
+                            // Grosor de la fuente
                             fontWeight: 800,
+
+                            // Espaciado entre letras
                             letterSpacing: '-0.5px',
-                            background: 'linear-gradient(90deg, #FFFFFF 0%, #D1D5DB 100%)',
+
+                            // Gradiente
+                            background:
+                                'linear-gradient(90deg, #FFFFFF 0%, #D1D5DB 100%)',
+
+                            // Hace que el gradiente se aplique únicamente al texto
                             WebkitBackgroundClip: 'text',
+
+                            // Oculta el color del texto para mostrar únicamente el gradiente
                             WebkitTextFillColor: 'transparent',
                         }}
                     >
+
                         Bienvenido a Kufin
+
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5 }}>
+
+                    {/* Subtítulo */}
+                    <Typography
+
+                        variant="body2"
+
+                        sx={{
+
+                            color: 'rgba(255,255,255,0.5)',
+
+                            mt: 0.5,
+                        }}
+                    >
+
                         Ingresa a tu cuenta para gestionar tus finanzas
+
                     </Typography>
+
                 </Box>
-                {/* Contenedor de Google Login */}
+
+                {/* Contenedor del botón de Google */}
                 <Box
+
                     sx={{
+
                         display: 'flex',
+
                         justifyContent: 'center',
+
                         mt: 4,
-                        // Limitamos el ancho para que el botón no se expanda innecesariamente
+
+                        // El ancho será únicamente el necesario
                         width: 'fit-content',
+
+                        // Centrado horizontal
                         mx: 'auto',
 
-                        // Estilos para el fondo blanco y esquinas redondeadas
+                        // Fondo blanco
                         backgroundColor: '#FFFFFF',
-                        borderRadius: '25px', // Redondez pronunciada para un look suave
-                        padding: '2px',       // Ajuste fino del espacio
-                        overflow: 'hidden',   // Asegura que no se salga del redondeo
 
-                        // Sombra suave para que destaque sobre el fondo oscuro del modal
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                        // Bordes muy redondeados
+                        borderRadius: '25px',
 
-                        // Transición para suavizar el aspecto al interactuar
+                        // Espacio interno
+                        padding: '2px',
+
+                        // Respeta los bordes redondeados
+                        overflow: 'hidden',
+
+                        // Sombra
+                        boxShadow:
+                            '0 4px 12px rgba(0,0,0,0.2)',
+
+                        // Animación suave
                         transition: 'transform 0.2s ease',
+
+                        // Al pasar el mouse aumenta un poco el tamaño
                         '&:hover': {
                             transform: 'scale(1.02)',
                         }
                     }}
                 >
+
+                    {/* Botón oficial de Google */}
                     <GoogleLogin
+
+                        // Se ejecuta si el login fue exitoso
                         onSuccess={onGoogleSuccess}
+
+                        // Se ejecuta si ocurre un error
                         onError={onGoogleError}
-                        theme="outline" // El tema outline usa fondo blanco
-                        size="medium"   // Puedes probar 'medium' o 'small' para reducir el tamaño
-                        shape="pill"    // Ayuda a que la forma base sea más redondeada
+
+                        // Tema con fondo blanco
+                        theme="outline"
+
+                        // Tamaño del botón
+                        size="medium"
+
+                        // Forma tipo píldora
+                        shape="pill"
                     />
+
                 </Box>
+
             </DialogContent>
-        </Dialog>)
+
+        </Dialog>
+    )
 }
