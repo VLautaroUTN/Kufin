@@ -1,0 +1,267 @@
+¡Excelente! Estuve revisando los archivos y la verdad es que ya hiciste gran parte del trabajo. 👍
+
+Lo único es que encontré algunas cosas que conviene corregir antes de seguir. Si no las arreglamos ahora, después van a aparecer errores difíciles de entender.
+
+---
+
+# 1. El error más importante: `useAuth()` dentro de una función
+
+En tu `LoginModal` tenés esto:
+
+```tsx
+const response = await axios.post(...);
+
+const { login } = useAuth();
+
+login({
+    nombre: response.data.nombre,
+    ...
+});
+```
+
+Eso **no está permitido**.
+
+Los Hooks (`useState`, `useEffect`, `useAuth`, etc.) **siempre deben llamarse al principio del componente**, nunca dentro de una función.
+
+Debe quedar así:
+
+```tsx
+export function LoginModal({ open, onClose }: LoginModalProps) {
+
+    const { login } = useAuth();
+
+    const [loading, setLoading] = useState(false);
+
+    const handleGoogleSuccess = async (...) => {
+
+        ...
+
+        login({
+            ...
+        });
+
+    };
+}
+```
+
+---
+
+# 2. El AuthContext todavía no recuerda la sesión
+
+Ahora mismo comienza así:
+
+```tsx
+const [usuario, setUsuario] = useState<Usuario | null>(null);
+```
+
+Eso significa que al presionar **F5** se pierde el usuario.
+
+Hay que agregar:
+
+```tsx
+import { useEffect } from "react";
+```
+
+y
+
+```tsx
+useEffect(() => {
+
+    const usuarioGuardado = localStorage.getItem("usuario");
+
+    if (usuarioGuardado) {
+        setUsuario(JSON.parse(usuarioGuardado));
+    }
+
+}, []);
+```
+
+Con eso ya queda persistente.
+
+---
+
+# 3. Navbar
+
+Actualmente recibe
+
+```tsx
+interface NavbarProps {
+
+    username: string | null;
+
+    onLoginClick: () => void;
+
+    onLogoutClick: () => void;
+}
+```
+
+Yo eliminaría completamente `username`.
+
+Quedaría
+
+```tsx
+interface NavbarProps {
+
+    onLoginClick: () => void;
+
+}
+```
+
+Y adentro del componente simplemente:
+
+```tsx
+const { usuario, logout } = useAuth();
+```
+
+Entonces en vez de
+
+```tsx
+username
+```
+
+usarías
+
+```tsx
+usuario?.nombre
+```
+
+Y donde aparece
+
+```tsx
+username.charAt(0)
+```
+
+sería
+
+```tsx
+usuario?.nombre.charAt(0)
+```
+
+o mejor
+
+```tsx
+usuario?.nombre?.charAt(0)
+```
+
+para evitar errores si todavía no inició sesión.
+
+---
+
+# 4. La foto de Google
+
+Ahora mismo el Avatar hace esto:
+
+```tsx
+<Avatar>
+
+    {username.charAt(0).toUpperCase()}
+
+</Avatar>
+```
+
+Como Google ya te devuelve la foto, podés hacer:
+
+```tsx
+<Avatar
+    src={usuario?.foto}
+>
+
+    {usuario?.nombre?.charAt(0)}
+
+</Avatar>
+```
+
+MUI automáticamente hace esto:
+
+* Si existe `src`, muestra la foto.
+* Si no existe, muestra la inicial.
+
+No hace falta escribir lógica extra.
+
+---
+
+# 5. DashboardHome
+
+También recibe
+
+```tsx
+username
+```
+
+Yo directamente eliminaría esa prop.
+
+Dentro del componente:
+
+```tsx
+const { usuario } = useAuth();
+```
+
+y luego
+
+```tsx
+¡Hola, {usuario?.nombre ?? "Invitado"}!
+```
+
+---
+
+# 6. App.tsx
+
+Después de eso, `App` ya no necesita manejar el usuario.
+
+Desaparecen estas cosas:
+
+```tsx
+const [username, setUsername] = useState(...)
+```
+
+```tsx
+handleLoginSuccess()
+```
+
+```tsx
+handleLogout()
+```
+
+Y las props
+
+```tsx
+username={...}
+```
+
+Todo eso deja de existir.
+
+---
+
+# Lo que quedaría
+
+```text
+Google Login
+       │
+       ▼
+LoginModal
+       │
+       ▼
+login(usuario)
+       │
+       ▼
+AuthContext
+       │
+ ┌─────┴──────────────┐
+ │                    │
+Navbar          DashboardHome
+ │                    │
+ │                    │
+useAuth()        useAuth()
+```
+
+Fijate que ahora **App ni siquiera participa**.
+
+Eso es justamente el objetivo del Context.
+
+---
+
+## Mi propuesta
+
+Creo que ya estamos en un punto donde vale la pena hacer una refactorización "de verdad" en lugar de ir cambiando líneas sueltas.
+
+Te propongo que en el próximo paso trabajemos sobre **`App.tsx`**. Es el último archivo grande que todavía mantiene la lógica antigua (`username`, `handleLoginSuccess`, `handleLogout`, etc.). Una vez que lo adaptemos al `AuthContext`, el sistema de autenticación va a quedar completamente desacoplado y ya no vas a tener que pasar el nombre del usuario de componente en componente. Es probablemente el cambio más importante de toda la refactorización.

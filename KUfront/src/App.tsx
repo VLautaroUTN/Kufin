@@ -14,6 +14,8 @@ import { Transactions } from './components/Dashboard/Transactions';
 import { Reports } from './components/Dashboard/Reports';
 import { LoginModal } from './components/Login';
 
+import { useAuth } from './components/AuthContext/AuthContext';
+
 // 1. Create a customized premium dark theme matching the design guidelines
 const darkTheme = createTheme({
   palette: {
@@ -78,6 +80,10 @@ interface Transaction {
 
 export function App() {
   // Navigation & User Session States
+  const {usuario, logout} = useAuth();
+
+  const nombreUsuarioNoLogueado = 'feo';
+
   const [username, setUsername] = useState<string | null>('Lautaro'); // Start logged in to wow the user immediately
   const [activeTab, setActiveTab] = useState(0); // 0 = Resumen, 1 = Movimientos, 2 = Reportes
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -100,15 +106,12 @@ export function App() {
     { id: 6, type: 'egreso', amount: 20000, category: 'Entretenimiento', date: '2026-07-14', description: 'Cine & Suscripción Streaming' },
   ]);
 
-  const handleLoginSuccess = (name: string) => {
-    // TODO(Backend): Aquí se debería guardar el token de autenticación devuelto por el backend
-    // (por ejemplo en localStorage o cookies) y setear el estado del usuario.
-    setUsername(name);
-    showToast(`¡Sesión iniciada con éxito! Bienvenido, ${name}.`, 'success');
-  };
+  const handleLoginSuccess = () => {
+    console.log('Usuario logueado exitosamente.');
+  }
 
   const handleLogout = () => {
-    setUsername(null);
+    logout();
     showToast('Sesión cerrada correctamente.', 'info');
   };
 
@@ -146,7 +149,7 @@ export function App() {
         return (
           <DashboardHome
             transactions={transactions}
-            username={username}
+            username={usuario?.nombre || nombreUsuarioNoLogueado}
             onLoginClick={() => setIsLoginOpen(true)}
             setActiveTab={setActiveTab}
           />
@@ -172,7 +175,7 @@ export function App() {
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#080B11' }}>
         {/* Navbar (Fixed height of 70px) */}
         <Navbar
-          username={username}
+          username={usuario?.nombre || nombreUsuarioNoLogueado}
           onLoginClick={() => setIsLoginOpen(true)}
           onLogoutClick={handleLogout}
         />
