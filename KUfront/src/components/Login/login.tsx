@@ -1,54 +1,24 @@
-// =======================
-// Componentes de Material UI
-// =======================
 import {
-    Dialog,            // Ventana modal
-    DialogContent,     // Contenido principal del Dialog
-    Box,               // Contenedor genérico (equivalente a un <div> pero con soporte para "sx")
-    Typography,        // Componente para mostrar texto con estilos de Material UI
-    IconButton,    // Permite agregar iconos dentro de un TextField (no se usa actualmente)
+    Dialog,
+    DialogContent,
+    Box,
+    Typography,
+    IconButton,
 } from '@mui/material';
-
-// =======================
-// Iconos de Material UI
-// =======================
-import {
-    CloseRounded, // Icono de ocultar contraseña (no se usa actualmente)
-} from '@mui/icons-material';
-
-// Componente oficial de Google para iniciar sesión mediante OAuth
+import { CloseRounded } from '@mui/icons-material';
 import { GoogleLogin } from '@react-oauth/google';
 
 
-// =======================
-// Propiedades que recibirá este componente
-// =======================
 export interface LoginViewProps {
-
-    // Indica si el modal está abierto o cerrado
     open: boolean;
-
-    // Función que se ejecutará al cerrar el modal
-    // Puede ser undefined si no queremos permitir el cierre
     onClose: (() => void) | undefined;
-
-    // Función que se ejecuta cuando Google devuelve un inicio de sesión exitoso
     onGoogleSuccess: (response: any) => void;
-
-    // Función que se ejecuta cuando ocurre un error durante el login
     onGoogleError: () => void;
-
-    // Indica si se está realizando una operación de carga
     loading: boolean;
 }
 
 
-// =======================
-// Componente Login
-// =======================
 export default function Login({
-
-    // Desestructuración de las propiedades recibidas
     open,
     onClose,
     onGoogleSuccess,
