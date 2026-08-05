@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   ThemeProvider,
-  createTheme,
   CssBaseline,
   Box,
   Snackbar,
@@ -14,60 +13,9 @@ import { Transactions } from './components/Dashboard/Transactions';
 import { Reports } from './components/Dashboard/Reports';
 import { LoginModal } from './components/Login';
 
+import { darkTheme } from './themes/themes';
 import { useAuth } from './components/AuthContext/AuthContext';
 
-// 1. Create a customized premium dark theme matching the design guidelines
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#6366F1', // Indigo
-      light: '#818CF8',
-      dark: '#4F46E5',
-    },
-    secondary: {
-      main: '#10B981', // Emerald / Green
-      light: '#34D399',
-      dark: '#059669',
-    },
-    background: {
-      default: '#080B11', // Dark obsidian
-      paper: '#111827', // Charcoal
-    },
-    text: {
-      primary: '#F9FAFB',
-      secondary: '#9CA3AF',
-    },
-  },
-  typography: {
-    fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-    h4: {
-      fontWeight: 800,
-    },
-    h5: {
-      fontWeight: 700,
-    },
-    h6: {
-      fontWeight: 700,
-    },
-    body1: {
-      fontWeight: 500,
-    },
-    body2: {
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          backgroundColor: '#080B11',
-          scrollbarColor: 'rgba(99, 102, 241, 0.2) rgba(8, 11, 17, 0.5)',
-        },
-      },
-    },
-  },
-});
 
 interface Transaction {
   id: number;
@@ -82,9 +30,9 @@ export function App() {
   // Navigation & User Session States
   const {usuario, logout} = useAuth();
 
-  const nombreUsuarioNoLogueado = 'feo';
+  const nombreUsuarioNoLogueado = 'Invitado';
 
-  const [username, setUsername] = useState<string | null>('Lautaro'); // Start logged in to wow the user immediately
+  //const [username, setUsername] = useState<string | null>('Lautaro'); // Start logged in to wow the user immediately
   const [activeTab, setActiveTab] = useState(0); // 0 = Resumen, 1 = Movimientos, 2 = Reportes
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
@@ -95,7 +43,7 @@ export function App() {
     severity: 'success',
   });
 
-  // TODO(Backend): Reemplazar este estado estático por un fetch al backend al cargar el componente.
+  // Reemplazar este estado estático por un fetch al backend al cargar el componente.
   // Ejemplo: useEffect(() => { fetch('/api/transactions').then(...) }, [])
   const [transactions, setTransactions] = useState<Transaction[]>([
     { id: 1, type: 'ingreso', amount: 350000, category: 'Sueldo', date: '2026-07-01', description: 'Salario Mensual UTN' },
