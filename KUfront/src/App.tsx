@@ -14,17 +14,9 @@ import { Reports } from './components/Dashboard/Reports';
 import { LoginModal } from './components/Login';
 
 import { darkTheme } from './themes/themes';
-import { useAuth } from './components/AuthContext/AuthContext';
+import { useAuth } from './components/Contexts/AuthContext';
+import type { Transaction } from './interfaces/transaction';
 
-
-interface Transaction {
-  id: number;
-  type: 'ingreso' | 'egreso';
-  amount: number;
-  category: string;
-  date: string;
-  description: string;
-}
 
 export function App() {
   // Navigation & User Session States
@@ -54,19 +46,13 @@ export function App() {
     { id: 6, type: 'egreso', amount: 20000, category: 'Entretenimiento', date: '2026-07-14', description: 'Cine & Suscripción Streaming' },
   ]);
 
-  const handleLoginSuccess = () => {
-    console.log('Usuario logueado exitosamente.');
-  }
-
   const handleLogout = () => {
+    console.log('Cerrando sesion, estoy en App.tsx');
     logout();
     showToast('Sesión cerrada correctamente.', 'info');
   };
 
   const handleAddTransaction = (newTx: Omit<Transaction, 'id'>) => {
-    // TODO(Backend): Enviar `newTx` a la API mediante un POST. 
-    // Una vez que el backend responda con éxito (y devuelva el ID real creado en la DB),
-    // se actualiza el estado local de transacciones.
     const tx: Transaction = {
       ...newTx,
       id: Date.now(), // Sustituir por el ID que devuelva el backend
@@ -149,7 +135,6 @@ export function App() {
         <LoginModal
           open={isLoginOpen}
           onClose={() => setIsLoginOpen(false)}
-          onLoginSuccess={handleLoginSuccess}
         />
 
         {/* Sleek Alert Banner Toast */}

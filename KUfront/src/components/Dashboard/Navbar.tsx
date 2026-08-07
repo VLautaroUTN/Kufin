@@ -21,6 +21,9 @@ import {
   LoginRounded,
 } from '@mui/icons-material';
 
+import { useAuth } from '../Contexts/AuthContext';
+
+
 interface NavbarProps {
   username: string | null;
   onLoginClick: () => void;
@@ -28,6 +31,9 @@ interface NavbarProps {
 }
 
 export function Navbar({ username, onLoginClick, onLogoutClick }: NavbarProps) {
+  
+  const { usuario } = useAuth();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
 
@@ -40,6 +46,7 @@ export function Navbar({ username, onLoginClick, onLogoutClick }: NavbarProps) {
   };
 
   const handleLogout = () => {
+    console.log('Cerrando sesión...');
     handleCloseMenu();
     onLogoutClick();
   };
@@ -105,7 +112,7 @@ export function Navbar({ username, onLoginClick, onLogoutClick }: NavbarProps) {
 
         {/* USER SECTION (Top Right) */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {username ? (
+          {usuario ? (
             <>
               {/* Premium Badge */}
               <Chip

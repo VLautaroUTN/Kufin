@@ -3,7 +3,7 @@ import { App } from './App.tsx'
 import './index.css'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
-import { AuthProvider } from './components/AuthContext/AuthContext.tsx'
+import { AuthProvider } from './components/Contexts/AuthContext.tsx'
 
 const root = createRoot(document.getElementById('root')!)
 

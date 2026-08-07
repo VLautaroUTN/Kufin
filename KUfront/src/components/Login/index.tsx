@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Login from './login';
 import axios from 'axios';
-import { useAuth } from '../AuthContext/AuthContext';
+import { useAuth } from '../Contexts/AuthContext';
 
 
 export interface LoginModalProps {
