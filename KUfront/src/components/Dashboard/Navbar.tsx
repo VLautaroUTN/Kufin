@@ -30,7 +30,7 @@ interface NavbarProps {
   onLogoutClick: () => void;
 }
 
-export function Navbar({ username, onLoginClick, onLogoutClick }: NavbarProps) {
+export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
   
   const { usuario } = useAuth();
 
