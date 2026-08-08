@@ -24,15 +24,9 @@ import {
 import { useAuth } from '../Contexts/AuthContext';
 
 
-interface NavbarProps {
-  username: string | null;
-  onLoginClick: () => void;
-  onLogoutClick: () => void;
-}
-
-export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
+export function Navbar() {
   
-  const { usuario } = useAuth();
+  const { usuario, login, logout } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
@@ -43,12 +37,6 @@ export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    console.log('Cerrando sesión...');
-    handleCloseMenu();
-    onLogoutClick();
   };
 
   return (
@@ -160,10 +148,10 @@ export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
                     boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
                   }}
                 >
-                  {username.charAt(0).toUpperCase()}
+                  {usuario?.foto}
                 </Avatar>
                 <Typography variant="body2" sx={{ fontWeight: 600, display: { xs: 'none', md: 'block' } }}>
-                  {username}
+                  {usuario?.nombre}
                 </Typography>
                 <KeyboardArrowDownRounded
                   sx={{
@@ -212,7 +200,7 @@ export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
               >
                 <Box sx={{ px: 2, py: 1.5 }}>
                   <Typography variant="body2" sx={{ fontWeight: 700, color: '#FFFFFF' }}>
-                    {username}
+                    {usuario?.nombre}
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)', display: 'block' }}>
                     Usuario Premium
@@ -232,7 +220,7 @@ export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
                   <ListItemText primary={<Typography variant="body2">Configuración</Typography>} />
                 </MenuItem>
                 <Divider sx={{ my: 0.5, borderColor: 'rgba(255, 255, 255, 0.06)' }} />
-                <MenuItem onClick={handleLogout} sx={{ '&:hover': { background: 'rgba(239, 68, 68, 0.12) !important', color: '#F87171 !important' } }}>
+                <MenuItem onClick={login} sx={{ '&:hover': { background: 'rgba(239, 68, 68, 0.12) !important', color: '#F87171 !important' } }}>
                   <ListItemIcon sx={{ color: '#F87171', minWidth: 32 }}>
                     <LogoutRounded fontSize="small" />
                   </ListItemIcon>
@@ -244,7 +232,7 @@ export function Navbar({ onLoginClick, onLogoutClick }: NavbarProps) {
             /* Logged Out State Button */
             <Button
               variant="outlined"
-              onClick={onLoginClick}
+              onClick={logout}
               startIcon={<LoginRounded fontSize="small" />}
               sx={{
                 borderRadius: '12px',

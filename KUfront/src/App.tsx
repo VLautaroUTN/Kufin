@@ -11,7 +11,7 @@ import { Sidebar } from './components/Dashboard/Sidebar';
 import { DashboardHome } from './components/Dashboard/DashboardHome';
 import { Transactions } from './components/Dashboard/Transactions';
 import { Reports } from './components/Dashboard/Reports';
-import { LoginModal } from './components/Login';
+import LoginModal from './components/Login/LoginModal';
 
 import { darkTheme } from './themes/themes';
 import { useAuth } from './components/Contexts/AuthContext';
@@ -109,9 +109,6 @@ export function App() {
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#080B11' }}>
         {/* Navbar (Fixed height of 70px) */}
         <Navbar
-          username={usuario?.nombre || nombreUsuarioNoLogueado}
-          onLoginClick={() => setIsLoginOpen(true)}
-          onLogoutClick={handleLogout}
         />
 
         {/* Sidebar (Width 260px) */}
