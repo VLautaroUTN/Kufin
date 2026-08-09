@@ -32,7 +32,7 @@ import {
 } from 'recharts';
 
 interface Transaction {
-  id: number;
+  id: string;
   type: 'ingreso' | 'egreso';
   amount: number;
   category: string;

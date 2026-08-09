@@ -19,6 +19,9 @@ import {
   Chip,
   IconButton,
   InputAdornment,
+  CircularProgress,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   DeleteOutlineRounded,
@@ -27,24 +30,30 @@ import {
 } from '@mui/icons-material';
 
 interface Transaction {
-  id: number;
+  id: string;
   type: 'ingreso' | 'egreso';
   amount: number;
   category: string;
   date: string;
   description: string;
+  grupoCuotaId?: string;
+  cuotaNumero?: number;
+  cuotasTotales?: number;
+  esCuotas?: boolean;
 }
 
 interface TransactionsProps {
   transactions: Transaction[];
   onAddTransaction: (t: Omit<Transaction, 'id'>) => void;
-  onDeleteTransaction: (id: number) => void;
+  onDeleteTransaction: (id: string) => void;
+  loading?: boolean;
 }
 
 export function Transactions({
   transactions,
   onAddTransaction,
   onDeleteTransaction,
+  loading = false,
 }: TransactionsProps) {
   // Search and filter states
   const [search, setSearch] = useState('');
@@ -56,6 +65,8 @@ export function Transactions({
   const [type, setType] = useState<'ingreso' | 'egreso'>('egreso');
   const [category, setCategory] = useState('Alimentos');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [esCuotas, setEsCuotas] = useState(false);
+  const [cuotasTotales, setCuotasTotales] = useState('3');
 
   const categories = {
     ingreso: ['Sueldo', 'Freelance', 'Inversiones', 'Otros'],
@@ -80,11 +91,14 @@ export function Transactions({
       type,
       category,
       date,
+      esCuotas: type === 'egreso' ? esCuotas : false,
+      cuotasTotales: type === 'egreso' && esCuotas ? parseInt(cuotasTotales, 10) : undefined,
     });
 
     // Reset form
     setDescription('');
     setAmount('');
+    setEsCuotas(false);
   };
 
   // Filter transactions
@@ -287,6 +301,54 @@ export function Transactions({
                 }}
               />
 
+              {/* Cuotas controls (solo para egresos) */}
+              {type === 'egreso' && (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={esCuotas}
+                        onChange={(e) => setEsCuotas(e.target.checked)}
+                        sx={{
+                          '& .MuiSwitch-switchBase.Mui-checked': {
+                            color: '#8B5CF6',
+                            '& + .MuiSwitch-track': { backgroundColor: '#6366F1' },
+                          },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem' }}>
+                        Compra en cuotas
+                      </Typography>
+                    }
+                  />
+
+                  {esCuotas && (
+                    <TextField
+                      fullWidth
+                      label="Cantidad de cuotas"
+                      size="small"
+                      type="number"
+                      value={cuotasTotales}
+                      onChange={(e) => setCuotasTotales(e.target.value)}
+                      slotProps={{ htmlInput: { min: 2, max: 60 } }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          color: '#FFFFFF',
+                          borderRadius: 2.5,
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.08)' },
+                          '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.15)' },
+                          '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                        },
+                        '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.4)' },
+                      }}
+                    />
+                  )}
+                </Box>
+              )}
+
               <Button
                 type="submit"
                 variant="contained"
@@ -466,13 +528,19 @@ export function Transactions({
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredTransactions.length === 0 && (
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                        <CircularProgress size={28} sx={{ color: '#6366F1' }} />
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredTransactions.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'rgba(255,255,255,0.3) !important', fontStyle: 'italic' }}>
                         No se encontraron movimientos registrados.
                       </TableCell>
                     </TableRow>
-                  )}
+                  ) : null}
                 </TableBody>
               </Table>
             </TableContainer>

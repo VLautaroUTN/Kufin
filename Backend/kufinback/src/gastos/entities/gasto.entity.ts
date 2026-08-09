@@ -1,5 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
+export type TipoMovimiento = 'ingreso' | 'egreso';
+
 @Entity('gastos')
 export class Gasto {
   @PrimaryGeneratedColumn('uuid')
@@ -20,6 +22,9 @@ export class Gasto {
 
   @Column()
   usuarioId!: string; // Acá guardaremos el ID de Google tuyo o de Belén
+
+  @Column({ type: 'varchar', default: 'egreso' })
+  tipo!: TipoMovimiento; // 'ingreso' o 'egreso'
 
   @CreateDateColumn()
   fechaDeCarga!: Date; // Se llena solo para saber en qué momento usaron la app
