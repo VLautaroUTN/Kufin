@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import axios from 'axios';
 
 
@@ -26,6 +26,18 @@ export const useAuth = () => useContext(AuthContext);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [usuario, setUsuario] = useState<Usuario | null>(null);
 
+    // Restaurar sesión al recargar la página
+    useEffect(() => {
+        const usuarioGuardado = localStorage.getItem("usuario");
+        if (usuarioGuardado) {
+            try {
+                setUsuario(JSON.parse(usuarioGuardado));
+            } catch {
+                localStorage.removeItem("usuario");
+            }
+        }
+    }, []);
+
     async function login(respuestaGoogle: any): Promise<void> {
         try {
             const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
@@ -47,8 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     function logout() {
-    setUsuario(null);
-    localStorage.removeItem("usuario");
+        setUsuario(null);
+        localStorage.removeItem("usuario");
     }
 
 
