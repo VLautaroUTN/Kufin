@@ -24,9 +24,13 @@ import {
 import { useAuth } from '../Contexts/AuthContext';
 
 
-export function Navbar() {
+interface NavbarProps {
+  onLoginClick: () => void;
+}
+
+export function Navbar({ onLoginClick }: NavbarProps) {
   
-  const { usuario, login, logout } = useAuth();
+  const { usuario, logout } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
@@ -220,7 +224,7 @@ export function Navbar() {
                   <ListItemText primary={<Typography variant="body2">Configuración</Typography>} />
                 </MenuItem>
                 <Divider sx={{ my: 0.5, borderColor: 'rgba(255, 255, 255, 0.06)' }} />
-                <MenuItem onClick={login} sx={{ '&:hover': { background: 'rgba(239, 68, 68, 0.12) !important', color: '#F87171 !important' } }}>
+                <MenuItem onClick={logout} sx={{ '&:hover': { background: 'rgba(239, 68, 68, 0.12) !important', color: '#F87171 !important' } }}>
                   <ListItemIcon sx={{ color: '#F87171', minWidth: 32 }}>
                     <LogoutRounded fontSize="small" />
                   </ListItemIcon>
@@ -232,7 +236,7 @@ export function Navbar() {
             /* Logged Out State Button */
             <Button
               variant="outlined"
-              onClick={logout}
+              onClick={onLoginClick}
               startIcon={<LoginRounded fontSize="small" />}
               sx={{
                 borderRadius: '12px',

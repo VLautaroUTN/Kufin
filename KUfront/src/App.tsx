@@ -109,6 +109,7 @@ export function App() {
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#080B11' }}>
         {/* Navbar (Fixed height of 70px) */}
         <Navbar
+          onLoginClick={() => setIsLoginOpen(true)}
         />
 
         {/* Sidebar (Width 260px) */}
@@ -132,6 +133,7 @@ export function App() {
         <LoginModal
           open={isLoginOpen}
           onClose={() => setIsLoginOpen(false)}
+          loading={false}
         />
 
         {/* Sleek Alert Banner Toast */}
