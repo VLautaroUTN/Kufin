@@ -53,18 +53,40 @@ export function Reports({ transactions }: ReportsProps) {
   const balance = totalIncome - totalExpense;
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
 
-  // 2. Prepare cumulative trend data (simulated based on historical base + current transactions)
-  // Let's create an incremental balance starting from a baseline
+  // 2. Prepare cumulative trend data dynamically based on real transactions
+  const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const now = new Date();
+  
+  // Generar últimos 6 meses
+  const monthsMap: Record<string, { month: string; yearMonth: string; net: number }> = {};
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    monthsMap[yearMonth] = { month: MONTH_NAMES[d.getMonth()], yearMonth, net: 0 };
+  }
 
-  const trendData = [
-    { month: 'Ene', Balance: 8500 },
-    { month: 'Feb', Balance: 10300 },
-    { month: 'Mar', Balance: 12000 },
-    { month: 'Abr', Balance: 13800 },
-    { month: 'May', Balance: 16000 },
-    { month: 'Jun', Balance: 18000 },
-    { month: 'Jul', Balance: 18000 + balance }, // add current month balance
-  ];
+  // Agrupar neto por mes
+  transactions.forEach((t) => {
+    if (!t.date) return;
+    const yearMonth = t.date.substring(0, 7);
+    if (!monthsMap[yearMonth]) {
+      const [y, m] = yearMonth.split('-').map(Number);
+      if (y && m) {
+        monthsMap[yearMonth] = { month: MONTH_NAMES[m - 1] || yearMonth, yearMonth, net: 0 };
+      }
+    }
+    if (monthsMap[yearMonth]) {
+      monthsMap[yearMonth].net += t.type === 'ingreso' ? t.amount : -t.amount;
+    }
+  });
+
+  // Calcular balance acumulado
+  const sortedMonths = Object.values(monthsMap).sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+  let runningBalance = 0;
+  const trendData = sortedMonths.map((m) => {
+    runningBalance += m.net;
+    return { month: m.month, Balance: runningBalance };
+  });
 
   // 3. Gastos por categoría
   const categoryTotals: Record<string, number> = {};
