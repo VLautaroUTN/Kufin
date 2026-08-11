@@ -66,16 +66,43 @@ export function DashboardHome({
 
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
 
-  // 2. Prepare Historical Chart Data (dynamically integrates current month "Julio" totals)
-  const chartData = [
-    { name: 'Ene', Ingresos: 3800, Egresos: 2100 },
-    { name: 'Feb', Ingresos: 4200, Egresos: 2400 },
-    { name: 'Mar', Ingresos: 4500, Egresos: 2800 },
-    { name: 'Abr', Ingresos: 4100, Egresos: 2300 },
-    { name: 'May', Ingresos: 5300, Egresos: 3100 },
-    { name: 'Jun', Ingresos: 4900, Egresos: 2900 },
-    { name: 'Jul', Ingresos: totalIncome, Egresos: totalExpense },
-  ];
+  // 2. Prepare Historical Chart Data dynamically based on real transactions (Last 6 months)
+  const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const now = new Date();
+  
+  // Generar los últimos 6 meses
+  const monthsList: { name: string; yearMonth: string; Ingresos: number; Egresos: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const name = MONTH_NAMES[d.getMonth()];
+    monthsList.push({ name, yearMonth, Ingresos: 0, Egresos: 0 });
+  }
+
+  // Agrupar movimientos reales por mes
+  transactions.forEach((t) => {
+    if (!t.date) return;
+    const yearMonth = t.date.substring(0, 7); // 'YYYY-MM'
+    const found = monthsList.find((m) => m.yearMonth === yearMonth);
+    if (found) {
+      if (t.type === 'ingreso') found.Ingresos += t.amount;
+      else if (t.type === 'egreso') found.Egresos += t.amount;
+    } else {
+      // Si hay movimientos fuera del rango de 6 meses, agregarlos dinámicamente
+      const [y, m] = yearMonth.split('-').map(Number);
+      if (y && m) {
+        monthsList.push({
+          name: MONTH_NAMES[m - 1] || yearMonth,
+          yearMonth,
+          Ingresos: t.type === 'ingreso' ? t.amount : 0,
+          Egresos: t.type === 'egreso' ? t.amount : 0,
+        });
+      }
+    }
+  });
+
+  monthsList.sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+  const chartData = monthsList.map(({ name, Ingresos, Egresos }) => ({ name, Ingresos, Egresos }));
 
   // 3. Prepare Pie Chart Data for Category Distribution (dynamic)
   const categoryTotals: Record<string, number> = {};
@@ -206,8 +233,8 @@ export function DashboardHome({
                 <AccountBalanceWalletRounded />
               </Box>
             </Box>
-            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#10B981', fontWeight: 600 }}>
-              +14.8% <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 400 }}>vs mes anterior</span>
+            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'rgba(255, 255, 255, 0.4)', fontWeight: 500 }}>
+              Calculado en tiempo real
             </Typography>
           </Paper>
         </Grid>
@@ -230,7 +257,7 @@ export function DashboardHome({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Box>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600 }}>
-                  Ingresos del Mes
+                  Ingresos Totales
                 </Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, mt: 1, color: '#10B981' }}>
                   {formatCurrency(totalIncome)}
@@ -240,8 +267,8 @@ export function DashboardHome({
                 <TrendingUpRounded />
               </Box>
             </Box>
-            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#10B981', fontWeight: 600 }}>
-              +8.2% <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 400 }}>vs mes anterior</span>
+            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'rgba(255, 255, 255, 0.4)', fontWeight: 500 }}>
+              Total registrado
             </Typography>
           </Paper>
         </Grid>
@@ -264,7 +291,7 @@ export function DashboardHome({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Box>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600 }}>
-                  Egresos del Mes
+                  Egresos Totales
                 </Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, mt: 1, color: '#EF4444' }}>
                   {formatCurrency(totalExpense)}
@@ -274,8 +301,8 @@ export function DashboardHome({
                 <TrendingDownRounded />
               </Box>
             </Box>
-            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#EF4444', fontWeight: 600 }}>
-              -4.3% <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 400 }}>vs mes anterior</span>
+            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'rgba(255, 255, 255, 0.4)', fontWeight: 500 }}>
+              Total registrado
             </Typography>
           </Paper>
         </Grid>
